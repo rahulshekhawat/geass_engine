@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "geass_sdk", "geass_sdk", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geass_engine", "geass_engine\geass_engine.vcxproj", "{7765CCB1-B54A-485C-9D80-5BDEF930F785}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geass_common", "geass_common\geass_common.vcxproj", "{F2520178-8FE2-4EB6-B071-6432F116729A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,16 @@ Global
 		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Release|x64.Build.0 = Release|x64
 		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Release|x86.ActiveCfg = Release|Win32
 		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Release|x86.Build.0 = Release|Win32
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Debug|x64.ActiveCfg = Debug|x64
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Debug|x64.Build.0 = Debug|x64
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Debug|x86.ActiveCfg = Debug|Win32
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Debug|x86.Build.0 = Debug|Win32
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Release|Any CPU.ActiveCfg = Release|Win32
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Release|x64.ActiveCfg = Release|x64
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Release|x64.Build.0 = Release|x64
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Release|x86.ActiveCfg = Release|Win32
+		{F2520178-8FE2-4EB6-B071-6432F116729A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +60,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297} = {00EBC0DB-2974-4EEF-88C0-6F42041F8EC7}
 		{7765CCB1-B54A-485C-9D80-5BDEF930F785} = {86D40156-EC3C-43FE-A742-BA41D9104D52}
+		{F2520178-8FE2-4EB6-B071-6432F116729A} = {86D40156-EC3C-43FE-A742-BA41D9104D52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8E74BF80-EC17-444D-8BB2-BE46DC123E3A}
