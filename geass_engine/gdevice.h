@@ -151,6 +151,17 @@ namespace Geass
 		STENCILOP_DECR,
 	};
 
+	enum EPrimitiveType
+	{	
+		// Primitive types
+		PT_POINTLIST = 0,
+		PT_LINELIST,
+		PT_LINESTRIP,
+		PT_TRIANGLELIST,
+		PT_TRIANGLESTRIP,
+		PT_TRIANGLEFAN,
+	};
+
 	struct RLOCKED_RECT
 	{
 		INT Pitch;
@@ -203,6 +214,12 @@ namespace Geass
 	class GVertexAttributeEx;
 	class GTextureInfo;
 	class LoadingController;
+	class GShaderFXPool;
+	class GPlane;
+	class GImage;
+	class GOcculsionQuery;
+	class GEventQuery;
+	class GD3DQueryManager;
 
 	class GEASS_API GDevice
 	{
@@ -420,107 +437,105 @@ namespace Geass
 		virtual bool ColorFill(GTexture* pTexture, DWORD dwColor = 0) = 0;
 
 		virtual bool UpdateTexture(GTexture* pTexture, int nLevel, int nDestX, int nDestY, int nDestWidth, int nDestHeight, int nSrcX, int nSrcY, int nSrcWidth, int nSrcHeight, void* pSrcPixels) = 0;
-		
-		/*
-
 
 		GTexture* GetDefaultTexture();
 		GTexture* GetDefaultNoiseTexture();
 
 		//////////////////////////////////////////////////////////////////////////
 		// Vertex Buffer
-		virtual HVERTEXBUFFER CreateVertexBuffer(const long size, int nVertexSize, const void* data = NULL, unsigned int flags = 0) = 0;
-		virtual void DeleteVertexBuffer(HVERTEXBUFFER hVertexBuffer) = 0;
-		virtual void* LockVertexBuffer(const HVERTEXBUFFER hVertexBuffer, const unsigned int flags = 0, const unsigned int nOffsetToLock = 0, const unsigned int nSizeToLock = 0) = 0;
-		virtual bool UnlockVertexBuffer(const HVERTEXBUFFER hVertexBuffer) = 0;
+		virtual int CreateVertexBuffer(const long size, int nVertexSize, const void* data = NULL, unsigned int flags = 0) = 0;
+		virtual void DeleteVertexBuffer(int hVertexBuffer) = 0;
+		virtual void* LockVertexBuffer(const int hVertexBuffer, const unsigned int flags = 0, const unsigned int nOffsetToLock = 0, const unsigned int nSizeToLock = 0) = 0;
+		virtual bool UnlockVertexBuffer(const int hVertexBuffer) = 0;
 
 		//////////////////////////////////////////////////////////////////////////
 		// Index Buffer
-		virtual HINDEXBUFFER CreateIndexBuffer(const unsigned int nIndices, EBufferFormat inf = RFMT_INDEX16, const void* data = NULL, unsigned int flags = 0) = 0;
-		virtual void DeleteIndexBuffer(HINDEXBUFFER hIndexBuffer) = 0;
-		virtual void* LockIndexBuffer(const HINDEXBUFFER hIndexBuffer, const unsigned int flags = 0, const unsigned int nOffsetToLock = 0, const unsigned int nSizeToLock = 0) = 0;
-		virtual bool UnlockIndexBuffer(const HINDEXBUFFER hIndexBuffer) = 0;
+		virtual int CreateIndexBuffer(const unsigned int nIndices, EBufferFormat inf = EBufferFormat::FMT_INDEX16, const void* data = NULL, unsigned int flags = 0) = 0;
+		virtual void DeleteIndexBuffer(int hIndexBuffer) = 0;
+		virtual void* LockIndexBuffer(const int hIndexBuffer, const unsigned int flags = 0, const unsigned int nOffsetToLock = 0, const unsigned int nSizeToLock = 0) = 0;
+		virtual bool UnlockIndexBuffer(const int hIndexBuffer) = 0;
 
 		//////////////////////////////////////////////////////////////////////////
 		// DrawPrimitives
-		virtual bool DrawIndexedPrimitiveUP(RPRIMITIVETYPE primitiveType, unsigned int nMinVertexIndex, unsigned int nNumVertices, unsigned int nPrimitiveCount,
-			const void* pIndexData, const void* pVertexStreamZeroData, unsigned int VertexStreamZeroStride, EBufferFormat indexFmt = RFMT_INDEX16) = 0;
-		virtual bool DrawIndexedPrimitive(RPRIMITIVETYPE primitiveType, unsigned int nBaseVertexIndex, unsigned int nMinIndex, unsigned int nNumVertices,
-			unsigned int nStartIndex, unsigned int nPrimitiveCount) = 0;
-		virtual bool DrawPrimitiveUP(RPRIMITIVETYPE primitiveType, unsigned int nPrimitiveCount, const void* pVertexStreamZeroData, unsigned int VertexStreamZeroStride) = 0;
-		virtual bool DrawPrimitive(RPRIMITIVETYPE primitiveType, unsigned int nStart, unsigned int nPrimitiveCount) = 0;
+		virtual bool DrawIndexedPrimitiveUP(
+			EPrimitiveType primitiveType,
+			unsigned int nMinVertexIndex,
+			unsigned int nNumVertices,
+			unsigned int nPrimitiveCount,
+			const void* pIndexData,
+			const void* pVertexStreamZeroData,
+			unsigned int VertexStreamZeroStride,
+			EBufferFormat indexFmt = EBufferFormat::FMT_INDEX16) = 0;
 
-		// TODO:
-			// FileManager ���� �е��� �����ʿ� + �����ϵ� ���̴� ���ϵ� �е��� ����
-			// ���̴� ���� ���� vs ps �ĺ����� �̸��� �ٲ��ֱ�
+		virtual bool DrawIndexedPrimitive(
+			EPrimitiveType primitiveType,
+			unsigned int nBaseVertexIndex,
+			unsigned int nMinIndex,
+			unsigned int nNumVertices,
+			unsigned int nStartIndex,
+			unsigned int nPrimitiveCount) = 0;
 
-			// ogl �� d3d ������ �ٸ� �����ڵ�
-			// asm file ���� �б�..
-			// hlsl file ���� �б�..
+		virtual bool DrawPrimitiveUP(EPrimitiveType primitiveType, unsigned int nPrimitiveCount, const void* pVertexStreamZeroData, unsigned int VertexStreamZeroStride) = 0;
+		virtual bool DrawPrimitive(EPrimitiveType primitiveType, unsigned int nStart, unsigned int nPrimitiveCount) = 0;
 
-		//	virtual HSHADER CreateShader( char* vsShaderBuffer,char* psShaderBuffer, char *extraDefines = NULL,const int vsLine = 0,const int psLine = 0, const char **attribs = NULL, const int nAttribs = 0) = 0;
-		//	        HSHADER CreateShaders( const char *vsFileName, const char *psFileName, char *extraDefines = NULL, const char** attribs = NULL, const int nAttribs = 0);
-		//	        HSHADER CreateShader( const char *shaderFile, const char **attribs = NULL, const int nAttribs = 0, char *extraDefines = NULL);
-		//	        HSHADER CreateShader( const char *shaderFile, char *extraDefines) { return CreateShader(shaderFile, NULL, 0, extraDefines); }
-
-			//////////////////////////////////////////////////////////////////////////
-			// Shader ����
+		//////////////////////////////////////////////////////////////////////////
+		// Shader
 		virtual void ShaderOff() = 0;
 
 		//////////////////////////////////////////////////////////////////////////
 		// ShaderFX
-		virtual RShaderFX* CreateShaderFX() = 0;
-		virtual RShaderFX* CreateShaderFX(const string& stFilename, const vector<string>& vShaderDefines = vector<string>(0), RShaderFXPool* pShaderPool = NULL) = 0;
-		virtual void DeleteShaderFX(RShaderFX* shader) = 0;
+		virtual GShaderFX* CreateShaderFX() = 0;
+		virtual GShaderFX* CreateShaderFX(const std::string& stFilename, const std::vector<std::string>& vShaderDefines = std::vector<std::string>(0), GShaderFXPool* pShaderPool = NULL) = 0;
+		virtual void DeleteShaderFX(GShaderFX* shader) = 0;
 
 		//////////////////////////////////////////////////////////////////////////
 		// State ����
-		virtual void SetVertexBuffer(const HVERTEXBUFFER hVertexBuffer, const int stream, const unsigned int offset) = 0;
-		virtual void SetVertexFormat(HVERTEXFORMAT hVertexFormat) = 0;
+		virtual void SetVertexBuffer(const int hVertexBuffer, const int stream, const unsigned int offset) = 0;
+		virtual void SetVertexFormat(int hVertexFormat) = 0;
 
-		virtual void SetupForRenderInstancing(const HVERTEXBUFFER hVertexBuffer, UINT nCnt, unsigned int offset = 0) = 0;
+		virtual void SetupForRenderInstancing(const int hVertexBuffer, UINT nCnt, unsigned int offset = 0) = 0;
 		virtual void RestoreForRenderInstancing() = 0;
 
-		virtual void SetIndexBuffer(HINDEXBUFFER hIndexBuffer) = 0;
+		virtual void SetIndexBuffer(int hIndexBuffer) = 0;
 
 		virtual void SetTexture(int nStage, GTexture* pTexture) = 0;
 		GTexture* GetTexture(int nStage);
-		virtual void SetTextureStageState(int nStage, RTEXTURESTAGESTATETYPE nStageStateType, unsigned int value) = 0;
+		virtual void SetTextureStageState(int nStage, ETextureStageStateType nStageStateType, unsigned int value) = 0;
 		virtual void SetTextureFilter(int nSampler, ETextureFilterType type) = 0;
 		virtual void SetTextureMipmapLodBias(int nStage, float fBias) = 0;
 		virtual void SetTextureMaxAnisotropy(int nStage, DWORD dwValue) = 0;
 		virtual DWORD GetTextureMaxAnisotropy(int nStage);
 		inline float GetTextureMipmapLodBias(int nStage);
-		virtual void SetTextureAddress(int nSampler, RTEXTUREADDRESS u, RTEXTUREADDRESS v, RTEXTUREADDRESS w) = 0;
+		virtual void SetTextureAddress(int nSampler, ETextureAddress u, ETextureAddress v, ETextureAddress w) = 0;
 		virtual void SetTextureBorderColor(int nSampler, const DWORD dwColor) = 0;
 		inline void SetTextureAddressClamp(int nSampler);
 		inline void SetTextureAddressWrap(int nSampler);
 
-		virtual void SetTransform(const RSETTRANSFORMTYPE type, const RMatrix& matrix) = 0;
-		virtual RMatrix GetTransform(const RSETTRANSFORMTYPE type) const = 0;
+		virtual void SetTransform(const ESetTransformType type, const FMatrix& matrix) = 0;
+		virtual FMatrix GetTransform(const ESetTransformType type) const = 0;
 
 		// blending
-		virtual void SetBlending(RBLEND srcFactor, RBLEND dstFactor = RBLEND_NONE, RBLENDOP blendMode = RBLENDOP_ADD) = 0;
-		virtual void SetSeparateBlending(RBLEND srcFactor, RBLEND dstFactor = RBLEND_NONE, RBLENDOP blendMode = RBLENDOP_ADD) = 0;
+		virtual void SetBlending(EBlend srcFactor, EBlend dstFactor = EBlend::BLEND_NONE, EBlendOP blendMode = EBlendOP::BLENDOP_ADD) = 0;
+		virtual void SetSeparateBlending(EBlend srcFactor, EBlend dstFactor = EBlend::BLEND_NONE, EBlendOP blendMode = EBlendOP::BLENDOP_ADD) = 0;
 		virtual void SetBlendFactor(const DWORD dwColor) = 0;
 		virtual void SetTextureFactor(const DWORD dwColor) = 0;
 
 		// alpha test
 		virtual void SetAlphaTestEnable(bool bEnable) = 0;
 		virtual void SetAlphaRef(DWORD dwRef) = 0;
-		virtual void SetAlphaFunc(RCMPFUNC Func) = 0;
+		virtual void SetAlphaFunc(ECMPFunc Func) = 0;
 		virtual bool GetAlphaTestEnable() = 0;
 		virtual DWORD GetAlphaRef() = 0;
-		virtual RCMPFUNC GetAlphaFunc() = 0;
+		virtual ECMPFunc GetAlphaFunc() = 0;
 
-		virtual void SetDepthFunc(RCMPFUNC depthFunc) = 0;
+		virtual void SetDepthFunc(ECMPFunc depthFunc) = 0;
 		virtual void SetDepthEnable(bool bEnable, bool bWriteEnable = true) = 0;
 		virtual void SetColorWriteEnable(bool bEnable) = 0;
-		virtual void SetCullMode(RCULL cullMode) = 0;
-		virtual void SetFillMode(RFILLMODE fillMode) = 0;
-		inline RFILLMODE GetFillMode();
+		virtual void SetCullMode(ECull cullMode) = 0;
+		virtual void SetFillMode(EFillMode fillMode) = 0;
+		inline EFillMode GetFillMode();
 
-		virtual void SetClipPlanes(const RPlane* pPlanes, int nCount) = 0;
+		virtual void SetClipPlanes(const GPlane* pPlanes, int nCount) = 0;
 		virtual void SetDepthBias(float fDepthBias = 0, float fSlopeScaleDepthBias = 0) = 0;
 
 		// stencil
@@ -529,10 +544,10 @@ namespace Geass
 		virtual void SetStencilRef(DWORD dwValue) = 0;
 		virtual void SetStencilMask(DWORD dwValue) = 0;
 		virtual void SetStencilWriteMask(DWORD dwValue) = 0;
-		virtual void SetStencilFunc(RCMPFUNC stencilFunc) = 0;
-		virtual void SetStencilOp(RSTENCILOP opPass, RSTENCILOP opFail, RSTENCILOP opZFail) = 0;
-		virtual void SetStencilCCWFunc(RCMPFUNC stencilFunc) = 0;	// twoside�� �޸�
-		virtual void SetStencilCCWOp(RSTENCILOP opPass, RSTENCILOP opFail, RSTENCILOP opZFail) = 0;
+		virtual void SetStencilFunc(ECMPFunc stencilFunc) = 0;
+		virtual void SetStencilOp(EStencilOP opPass, EStencilOP opFail, EStencilOP opZFail) = 0;
+		virtual void SetStencilCCWFunc(ECMPFunc stencilFunc) = 0;	// twoside�� �޸�
+		virtual void SetStencilCCWOp(EStencilOP opPass, EStencilOP opFail, EStencilOP opZFail) = 0;
 
 		virtual void SetPointSpriteEnable(bool bEnable) = 0;
 		virtual void SetPointSizeAndScale(float fSize, float fMin, float fMax, bool bScaleEnable, float fScaleA, float fScaleB, float fScaleC) = 0;
@@ -547,10 +562,8 @@ namespace Geass
 
 		// fog
 		virtual void SetFogEnable(bool bEnable) = 0;
-		virtual void SetFog(bool bLinearFog, DWORD dwColor, float fNear, float fFar, float fDensity,
-			bool bPixelFog, bool bRangeFog)
-		{
-		}
+		virtual void SetFog(bool bLinearFog, DWORD dwColor, float fNear, float fFar, float fDensity, bool bPixelFog, bool bRangeFog) { ; }
+
 		virtual void SetFogColor(DWORD dwColor) {}
 		virtual void SetFogVertexMode(bool bPixelFog, bool bRangeFog) {}
 		inline bool GetFogEnable();
@@ -561,7 +574,7 @@ namespace Geass
 		// etc
 		virtual void SetNormalizeNormals(bool bEnable) = 0;
 		virtual void SetAmbient(DWORD dwColor) = 0;
-		virtual void SetClipping(bool bEnable) = 0;		// Direct3D Ŭ����(���������Ҹ�)�� �Ѱų� ����.
+		virtual void SetClipping(bool bEnable) = 0;
 
 		virtual void SetScissorTestEnable(bool bEnable) = 0;
 		virtual void SetScissorRect(const RECT* pRect) = 0;
@@ -574,42 +587,82 @@ namespace Geass
 
 		virtual void SetColorVertex(bool bEnable) = 0;
 
-		virtual RImage* CreateImage(int nWidth, int nHeight, EBufferFormat format, void* pSrcPixels, int nSourcePitch, int nSrcX, int nSrcY);
-		virtual void DeleteImage(RImage*);
+		virtual GImage* CreateImage(int nWidth, int nHeight, EBufferFormat format, void* pSrcPixels, int nSourcePitch, int nSrcX, int nSrcY);
+		virtual void DeleteImage(GImage*);
 
-		virtual bool SetCursorProperties(int XHotSpot, int YHotSpot, RImage* pImage);
+		virtual bool SetCursorProperties(int XHotSpot, int YHotSpot, GImage* pImage);
 
-		inline void			SetDofParams(RVector4& vParams);
-		inline const RVector4& GetDofParams() const;
+		inline void SetDofParams(FVector4& vParams);
+		inline const FVector4& GetDofParams() const;
 
 		virtual bool IsCurrentDisplayModeSupportFullScreenMode() = 0;
 
 		//Query
-		virtual	ROcclusionQuery* CreateOcclusionQuery(void) = 0;
-		virtual void				ReleaseOcclusionQuery(ROcclusionQuery* pQuery) = 0;
-		virtual REventQuery* CreateEventQuery(void) = 0;
-		virtual void				ReleaseEventQuery(REventQuery* pEventQuery) = 0;
-		virtual RD3DQueryManager* GetQueryManager(void) { return NULL; }
+		virtual	GOcculsionQuery* CreateOcclusionQuery(void) = 0;
+		virtual void ReleaseOcclusionQuery(GOcculsionQuery* pQuery) = 0;
+		virtual GEventQuery* CreateEventQuery(void) = 0;
+		virtual void ReleaseEventQuery(GEventQuery* pEventQuery) = 0;
+		virtual GD3DQueryManager* GetQueryManager(void) { return NULL; }
 
 		// Profile Marker
-		virtual void				SetProfileMarker(LPCWSTR wszName) = 0;
-		virtual void				BeginProfileMarker(LPCWSTR wszName) = 0;
-		virtual void				EndProfileMarker() = 0;
+		virtual void SetProfileMarker(LPCWSTR wszName) = 0;
+		virtual void BeginProfileMarker(LPCWSTR wszName) = 0;
+		virtual void EndProfileMarker() = 0;
 
-
-		//////////////////////////////////////////////////////////////////////////
-		// �ܺο����� �����Ҷ� �ʿ��� �Լ���,
-		// �̵������� ���� �̿��� �뵵�� ������� ����.
-
-		// �ܺ� ���̺귯������ �������� ������ LPDIRECT3DDEVICE9 �� ��� ������ �̰ɷ� �� ĳ�����ؼ� ������
 		virtual void* GetLPDIRECT3DDEVICE9() { return NULL; }
 
 		virtual void* GetD3DPRESENT_PARAMETERS() { return NULL; }
 
-		/// ��ũ���� ����
 		virtual bool SaveScreenShot(const char* szFileName) { return false; }
-		virtual RImage* GetSaveScreenImage() { return NULL; }
-		*/
+		virtual GImage* GetSaveScreenImage() { return NULL; }
 
 	};
+
+	inline float GDevice::GetTextureMipmapLodBias(int nStage)
+	{
+		return 0.0f;
+	}
+
+	inline void GDevice::SetTextureAddressClamp(int nSampler)
+	{
+	}
+
+	inline void GDevice::SetTextureAddressWrap(int nSampler)
+	{
+	}
+
+	inline bool GDevice::GetFogEnable()
+	{
+		return false;
+	}
+
+	inline float GDevice::GetFogNear()
+	{
+		return 0.0f;
+	}
+
+	inline float GDevice::GetFogFar()
+	{
+		return 0.0f;
+	}
+
+	inline DWORD GDevice::GetFogColor()
+	{
+		return 0;
+	}
+
+	inline void GDevice::SetDofParams(FVector4& vParams)
+	{
+		DofParams = vParams;
+	}
+
+	inline const FVector4& GDevice::GetDofParams() const
+	{
+		return DofParams;
+	}
+
+	inline EFillMode GDevice::GetFillMode()
+	{
+		return EFillMode();
+	}
 }

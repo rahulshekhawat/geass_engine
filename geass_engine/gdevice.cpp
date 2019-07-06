@@ -101,4 +101,37 @@ namespace Geass
 		return nullptr;
 	}
 
+	GTexture* GDevice::GetDefaultTexture()
+	{
+		return nullptr;
+	}
+
+	GTexture* GDevice::GetDefaultNoiseTexture()
+	{
+		return nullptr;
+	}
+
+	GTexture* GDevice::GetTexture(int nStage)
+	{
+		return nullptr;
+	}
+
+	DWORD GDevice::GetTextureMaxAnisotropy(int nStage)
+	{
+		return 0;
+	}
+
+	GImage* GDevice::CreateImage(int nWidth, int nHeight, EBufferFormat format, void* pSrcPixels, int nSourcePitch, int nSrcX, int nSrcY)
+	{
+		return nullptr;
+	}
+
+	void GDevice::DeleteImage(GImage*)
+	{
+	}
+
+	bool GDevice::SetCursorProperties(int XHotSpot, int YHotSpot, GImage* pImage)
+	{
+		return false;
+	}
 }
