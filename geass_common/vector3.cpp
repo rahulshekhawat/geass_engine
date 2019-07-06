@@ -2,6 +2,11 @@
 #include "vector3.h"
 #include "msvector.h"
 
+const FVector3 FVector3::ZERO(0.f, 0.f, 0.f);
+const FVector3 FVector3::AXISX(1.f, 0.f, 0.f);
+const FVector3 FVector3::AXISY(0.f, 1.f, 0.f);
+const FVector3 FVector3::AXISZ(0.f, 0.f, 1.f);
+
 FVector3& FVector3::operator=(const MSVector& other)
 {
 	MSVector other2 = other;

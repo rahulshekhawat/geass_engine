@@ -10,5 +10,6 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 #include <math.h>
+#include <assert.h>
 
 #endif //PCH_H

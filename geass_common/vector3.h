@@ -301,3 +301,8 @@ inline bool FVector3::IsEqual(const FVector3& other, float Tolerance) const
 		((other.y - y) <= Tolerance) &&
 		((other.z - z) <= Tolerance);
 }
+
+inline FVector3 CrossProduct(const FVector3& v1, const FVector3& v2)
+{
+	return v1.CrossProduct(v2);
+}
