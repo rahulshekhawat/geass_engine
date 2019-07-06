@@ -883,3 +883,154 @@ inline void FMatrix::ExtractScale(FVector3& vecScale) const
 	vecScale.y = FVector3(_21, _22, _23).Length();
 	vecScale.z = FVector3(_31, _32, _33).Length();
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+// Aligned 16 Matrix (for SSE)
+__declspec(align(16))
+class GEASS_API FMatrixA16 : public FMatrix
+{
+public:
+	inline FMatrixA16& operator=(const FMatrixA16& other);
+	inline FMatrixA16& operator=(const FMatrix& other);
+
+	inline void MultiplyTo(const FMatrixA16& other, FMatrixA16& out) const; // out = this * other;
+};
+
+inline FMatrixA16& FMatrixA16::operator=(const FMatrixA16& other)
+{
+	__asm
+	{
+		mov esi, other;
+		mov edi, this;
+		movdqa xmm0, xmmword ptr[esi];
+		movdqa xmm1, xmmword ptr[esi + 0x10];
+		movdqa xmm2, xmmword ptr[esi + 0x20];
+		movdqa xmm3, xmmword ptr[esi + 0x30];
+
+		movdqa xmmword ptr[edi], xmm0;
+		movdqa xmmword ptr[edi + 0x10], xmm1;
+		movdqa xmmword ptr[edi + 0x20], xmm2;
+		movdqa xmmword ptr[edi + 0x30], xmm3;
+	}
+	return *this;
+}
+
+inline FMatrixA16& FMatrixA16::operator=(const FMatrix& other)
+{
+	__asm
+	{
+		mov esi, other;
+		mov edi, this;
+		movdqu xmm0, xmmword ptr[esi];
+		movdqu xmm1, xmmword ptr[esi + 0x10];
+		movdqu xmm2, xmmword ptr[esi + 0x20];
+		movdqu xmm3, xmmword ptr[esi + 0x30];
+
+		movdqa xmmword ptr[edi], xmm0;
+		movdqa xmmword ptr[edi + 0x10], xmm1;
+		movdqa xmmword ptr[edi + 0x20], xmm2;
+		movdqa xmmword ptr[edi + 0x30], xmm3;
+	}
+	return *this;
+}
+
+inline void FMatrixA16::MultiplyTo(const FMatrixA16& other, FMatrixA16& mOut) const
+{
+	__asm
+	{
+		mov		   eax, mOut	   	   // dst
+		mov		   ecx, other	  	   // src1
+		mov		   edx, this	  	   // src2
+
+		movaps	 xmm0, xmmword ptr[ecx]	  	   // xmm0 = src1[00, 01, 02, 03]
+		movaps	 xmm1, xmmword ptr[ecx + 0x10]	   // xmm1 = src1[04, 05, 06, 07]
+		movaps	 xmm2, xmmword ptr[ecx + 0x20]	   // xmm2 = src1[08, 09, 10, 11]
+		movaps	 xmm3, xmmword ptr[ecx + 0x30]	   // xmm3 = src1[12, 13, 14, 15]
+
+		movss	  xmm7, dword ptr[edx]		   // xmm7 = src2[00, xx, xx, xx]
+		movss	  xmm4, dword ptr[edx + 0x4]	  // xmm4 = src2[01, xx, xx, xx]
+		movss	  xmm5, dword ptr[edx + 0x8]	  // xmm5 = src2[02, xx, xx, xx]
+		movss	  xmm6, dword ptr[edx + 0xc]	  	   // xmm6 = src2[03, xx, xx, xx]
+
+		shufps	 xmm7, xmm7, 0x0	  	   // xmm7 = src2[00, 00, 00, 00]
+		shufps	 xmm4, xmm4, 0x0	  	   // xmm4 = src2[01, 01, 01, 01]
+		shufps	 xmm5, xmm5, 0x0	  	   // xmm5 = src2[02, 02, 02, 02]
+		shufps	 xmm6, xmm6, 0x0	  	   // xmm6 = src2[03, 03, 03, 03]
+
+		mulps	  xmm7, xmm0	   	   	   // xmm7 *= xmm0
+		mulps	  xmm4, xmm1	   	   	   // xmm4 *= xmm1
+		mulps	  xmm5, xmm2	   	   	   // xmm5 *= xmm2
+		mulps	  xmm6, xmm3	   	   	   // xmm6 *= xmm3
+
+		addps	  xmm7, xmm4	   	   	   // xmm7 += xmm4
+		addps	  xmm7, xmm5	   	   	   // xmm7 += xmm5
+		addps	  xmm7, xmm6	   	   	   // xmm7 += xmm6
+
+		movaps	 xmmword ptr[eax], xmm7		   // eax = xmm7
+
+		movss	  xmm7, dword ptr[edx + 0x10]	 // xmm7 = src2[04, xx, xx, xx]
+		movss	  xmm4, dword ptr[edx + 0x14]	 // xmm4 = src2[05, xx, xx, xx]
+		movss	  xmm5, dword ptr[edx + 0x18]	 // xmm5 = src2[06, xx, xx, xx]
+		movss	  xmm6, dword ptr[edx + 0x1c]	 // xmm6 = src2[07, xx, xx, xx]
+
+		shufps	 xmm7, xmm7, 0x0	  	   // xmm7 = src2[04, 04, 04, 04]
+		shufps	 xmm4, xmm4, 0x0	  	   // xmm4 = src2[05, 05, 05, 05]
+		shufps	 xmm5, xmm5, 0x0	  	   // xmm5 = src2[06, 06, 06, 06]
+		shufps	 xmm6, xmm6, 0x0	  	   // xmm6 = src2[07, 07, 07, 07]
+
+		mulps	  xmm7, xmm0	   	   	   // xmm7 *= xmm0
+		mulps	  xmm4, xmm1	   	   	   // xmm4 *= xmm1
+		mulps	  xmm5, xmm2	   	   	   // xmm5 *= xmm2
+		mulps	  xmm6, xmm3	   	   	   // xmm6 *= xmm3
+
+		addps	  xmm7, xmm4	   	   	   // xmm7 += xmm4
+		addps	  xmm7, xmm5	   	   	   // xmm7 += xmm5
+		addps	  xmm7, xmm6	   	   	   // xmm7 += xmm6
+
+		movaps	 xmmword ptr[eax + 0x10], xmm7	 // eax = xmm7
+
+		movss	  xmm7, dword ptr[edx + 0x20]	 // xmm7 = src2[08, xx, xx, xx]
+		movss	  xmm4, dword ptr[edx + 0x24]	 // xmm4 = src2[09, xx, xx, xx]
+		movss	  xmm5, dword ptr[edx + 0x28]	 // xmm5 = src2[10, xx, xx, xx]
+		movss	  xmm6, dword ptr[edx + 0x2c]	 // xmm6 = src2[11, xx, xx, xx]
+
+		shufps	 xmm7, xmm7, 0x0	  	   // xmm7 = src2[08, 08, 08, 08]
+		shufps	 xmm4, xmm4, 0x0	  	   // xmm4 = src2[09, 09, 09, 09]
+		shufps	 xmm5, xmm5, 0x0	  	   // xmm5 = src2[10, 10, 10, 10]
+		shufps	 xmm6, xmm6, 0x0	  	   // xmm6 = src2[11, 11, 11, 11]
+
+		mulps	  xmm7, xmm0	   	   	   // xmm7 *= xmm0
+		mulps	  xmm4, xmm1	   	   	   // xmm4 *= xmm1
+		mulps	  xmm5, xmm2	   	   	   // xmm5 *= xmm2
+		mulps	  xmm6, xmm3	   	   	   // xmm6 *= xmm3
+
+		addps	  xmm7, xmm4	   	   	   // xmm7 += xmm4
+		addps	  xmm7, xmm5	   	   	   // xmm7 += xmm5
+		addps	  xmm7, xmm6	   	   	   // xmm7 += xmm6
+
+		movaps	 xmmword ptr[eax + 0x20], xmm7	 // eax = xmm7
+
+		movss	  xmm7, dword ptr[edx + 0x30]	 // xmm7 = src2[12, xx, xx, xx]
+		movss	  xmm4, dword ptr[edx + 0x34]	 // xmm4 = src2[13, xx, xx, xx]
+		movss	  xmm5, dword ptr[edx + 0x38]	 // xmm5 = src2[14, xx, xx, xx]
+		movss	  xmm6, dword ptr[edx + 0x3c]	 // xmm6 = src2[15, xx, xx, xx]
+
+		shufps	 xmm7, xmm7, 0x0	  	   // xmm7 = src2[12, 12, 12, 12]
+		shufps	 xmm4, xmm4, 0x0	  	   // xmm4 = src2[13, 13, 13, 13]
+		shufps	 xmm5, xmm5, 0x0	  	   // xmm5 = src2[14, 14, 14, 14]
+		shufps	 xmm6, xmm6, 0x0	  	   // xmm6 = src2[15, 15, 15, 15]
+
+		mulps	  xmm7, xmm0	   	   	   // xmm7 *= xmm0
+		mulps	  xmm4, xmm1	   	   	   // xmm4 *= xmm1
+		mulps	  xmm5, xmm2	   	   	   // xmm5 *= xmm2
+		mulps	  xmm6, xmm3	   	   	   // xmm6 *= xmm3
+
+		addps	  xmm7, xmm4	   	   	   // xmm7 += xmm4
+		addps	  xmm7, xmm5	   	   	   // xmm7 += xmm5
+		addps	  xmm7, xmm6	   	   	   // xmm7 += xmm6
+
+		movaps	 xmmword ptr[eax + 0x30], xmm7	 // eax = xmm7
+	}
+}
+//////////////////////////////////////////////////////////////////////////
