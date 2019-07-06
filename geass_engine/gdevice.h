@@ -2,7 +2,7 @@
 
 #pragma warning( disable : 4251 )
 
-#include "glib.h"
+#include "ge_lib.h"
 #include "gtypes.h"
 #include <matrix.h>
 #include <vector>
@@ -221,7 +221,7 @@ namespace Geass
 	class GEventQuery;
 	class GD3DQueryManager;
 
-	class GEASS_API GDevice
+	class GEASSENGINE_API GDevice
 	{
 	public:
 		GDevice();
@@ -663,6 +663,6 @@ namespace Geass
 
 	inline EFillMode GDevice::GetFillMode()
 	{
-		return EFillMode();
+		return CurrentFillMode;
 	}
 }

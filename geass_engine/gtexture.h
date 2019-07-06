@@ -1,10 +1,10 @@
 #pragma once
 
-#include "glib.h"
+#include "ge_lib.h"
 
 namespace Geass
 {
-	class GEASS_API GTexture
+	class GEASSENGINE_API GTexture
 	{
 	public:
 		// GTexture();

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "ge_lib.h"
+
 namespace Geass
 {
-	class GViewport
+	class GEASSENGINE_API GViewport
 	{
 	public:
 		DWORD       x;

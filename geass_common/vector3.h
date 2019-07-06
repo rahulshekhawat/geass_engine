@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pch.h"
-#include "glib.h"
+#include "gc_lib.h"
 
 class MSVector;
 class MSVector2;

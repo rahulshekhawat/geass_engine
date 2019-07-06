@@ -17,9 +17,6 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="glib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engineapp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -33,6 +30,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gtexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ge_lib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

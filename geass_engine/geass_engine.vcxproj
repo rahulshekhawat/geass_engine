@@ -164,7 +164,7 @@
     <ClInclude Include="engineapp.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="gdevice.h" />
-    <ClInclude Include="glib.h" />
+    <ClInclude Include="ge_lib.h" />
     <ClInclude Include="gscenemanager.h" />
     <ClInclude Include="gtexture.h" />
     <ClInclude Include="gtypes.h" />

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "glib.h"
+#include "ge_lib.h"
 
 namespace Geass
 {
 	class GDevice;
 
-	class GEASS_API GSceneManager
+	class GEASSENGINE_API GSceneManager
 	{
 	public:
 		GSceneManager();
