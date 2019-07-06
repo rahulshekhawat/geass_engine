@@ -5,25 +5,49 @@ VisualStudioVersion = 16.0.29025.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ryu_game", "ryu_game\ryu_game.vcxproj", "{6EDD248C-5D8B-4619-A3C2-B4A03D928297}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{00EBC0DB-2974-4EEF-88C0-6F42041F8EC7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "geass_sdk", "geass_sdk", "{86D40156-EC3C-43FE-A742-BA41D9104D52}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geass_engine", "geass_engine\geass_engine.vcxproj", "{7765CCB1-B54A-485C-9D80-5BDEF930F785}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Debug|x64.ActiveCfg = Debug|x64
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Debug|x64.Build.0 = Debug|x64
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Debug|x86.ActiveCfg = Debug|Win32
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Debug|x86.Build.0 = Debug|Win32
+		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Release|Any CPU.ActiveCfg = Release|Win32
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Release|x64.ActiveCfg = Release|x64
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Release|x64.Build.0 = Release|x64
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Release|x86.ActiveCfg = Release|Win32
 		{6EDD248C-5D8B-4619-A3C2-B4A03D928297}.Release|x86.Build.0 = Release|Win32
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Debug|x64.ActiveCfg = Debug|x64
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Debug|x64.Build.0 = Debug|x64
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Debug|x86.ActiveCfg = Debug|Win32
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Debug|x86.Build.0 = Debug|Win32
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Release|Any CPU.ActiveCfg = Release|Win32
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Release|x64.ActiveCfg = Release|x64
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Release|x64.Build.0 = Release|x64
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Release|x86.ActiveCfg = Release|Win32
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6EDD248C-5D8B-4619-A3C2-B4A03D928297} = {00EBC0DB-2974-4EEF-88C0-6F42041F8EC7}
+		{7765CCB1-B54A-485C-9D80-5BDEF930F785} = {86D40156-EC3C-43FE-A742-BA41D9104D52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8E74BF80-EC17-444D-8BB2-BE46DC123E3A}
