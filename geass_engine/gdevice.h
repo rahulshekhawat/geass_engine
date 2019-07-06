@@ -5,152 +5,204 @@
 #include "glib.h"
 #include "gtypes.h"
 #include <matrix.h>
+#include <vector>
 
+namespace Geass
+{
 #define MAX_PIXELSAMPLER	16
 #define MAX_VERTEXSAMPLER	4
 #define MAX_IMAGEUNIT		MAX_PIXELSAMPLER+MAX_VERTEXSAMPLER
 #define MAX_VERTEXSTREAM	4
 
 
-const int MAX_RENDERTARGET = 4;
+// Flags field for Issue
+#define RISSUE_END (1 << 0)		// Tells the runtime to issue the end of a query, changing it's state to "non-signaled".
+#define RISSUE_BEGIN (1 << 1)	// Tells the runtime to issue the beginng of a query.
 
-enum class ETextureAddress
-{
-	TADDRESS_WRAP = 0,
-	TADDRESS_MIRROR,
-	TADDRESS_CLAMP,
-	TADDRESS_BORDER,
-	TADDRESS_MIRRORONCE,
-};
+#define RCT_CLAMP			0x1
+#define RCT_CUBEMAP			0x8
+#define RCT_NORMALMAP		0x20
+#define RCT_AUTOGENMIPMAP	0x40
+#define RCT_RENDERTARGET	0x80
+#define RCT_DYNAMIC			0x100
+#define RCT_UNREDUCIBLE		0x200
+#define RCT_SYSTEMMEM		0x400
+#define RCT_DEPTHSTENCIL	0x800
 
-enum class ETextureStageStateType
-{	
-	// stage state
-	TSS_COLOROP = 0,
-	TSS_COLORARG1,
-	TSS_COLORARG2,
-	TSS_ALPHAOP,
-	TSS_ALPHAARG1,
-	TSS_ALPHAARG2,
-	TSS_BUMPENVMAT00,
-	TSS_BUMPENVMAT01,
-	TSS_BUMPENVMAT10,
-	TSS_BUMPENVMAT11,
-	TSS_TEXCOORDINDEX,
-	TSS_BUMPENVLSCALE,
-	TSS_BUMPENVLOFFSET,
-	TSS_TEXTURETRANSFORMFLAGS,
-	TSS_COLORARG0,
-	TSS_ALPHAARG0,
-	TSS_RESULTARG,
-	TSS_CONSTANT,
+	const int MAX_RENDERTARGET = 4;
 
-	TSS_MAX
-};
-
-enum class EBlend
-{	
-	// Blending constants
-	BLEND_ZERO = 0,
-	BLEND_ONE,
-	BLEND_SRCCOLOR,
-	BLEND_INVSRCCOLOR,
-	BLEND_DESTCOLOR,
-	BLEND_INVDESTCOLOR,
-	BLEND_SRCALPHA,
-	BLEND_INVSRCALPHA,
-	BLEND_DESTALPHA,
-	BLEND_INVDESTALPHA,
-	BLEND_SRCALPHASAT,
-	BLEND_BLENDFACTOR,
-	BLEND_INVBLENDFACTOR,
-
-	BLEND_NONE,
-};
-
-enum class EBlendOP
-{	
-	// Blending operation
-	BLENDOP_ADD = 0,
-	BLENDOP_SUBTRACT,
-	BLENDOP_REVSUBTRACT,
-	BLENDOP_MIN,
-	BLENDOP_MAX,
-};
-
-enum class ECMPFunc
-{		
-	// depth compare function
-	CMP_NEVER = 0,
-	CMP_LESS,
-	CMP_EQUAL,
-	CMP_LESSEQUAL,
-	CMP_GREATER,
-	CMP_NOTEQUAL,
-	CMP_GREATEREQUAL,
-	CMP_ALWAYS,
-	CMP_END
-};
-
-enum class ECull
-{
-	// Culling
-	CULL_NONE = 0,
-	CULL_CCW,
-	CULL_CW,
-};
-
-enum class EFillMode
-{	
-	// wireframe ( triangle line ) , solid
-	FILL_POINT = 0,
-	FILL_WIRE,
-	FILL_SOLID
-};
-
-struct FDeviceProfileInfo
-{
-	// Æú¸®°ï¼ö
-	int nDP;	// drawprimitive
-	int nDIP;	// drawindexprimitive
-	int nDPUP;	// drawprimitiveup
-	int nDIPUP;	// drawindexedprimitiveup
-
-	// call ¼ö
-	int nDPCall;	// drawprimitive
-	int nDIPCall;	// drawindexprimitive
-	int nDPUPCall;	// drawprimitiveup
-	int nDIPUPCall;	// drawindexedprimitiveup
-
-	unsigned int nReducedDPCall;
-	unsigned int nReducedDIPCall;
-
-	void AddDP(int n, unsigned int nInstanceCount) { nDPCall++; nDP += n * nInstanceCount; nReducedDPCall += nInstanceCount - 1; }
-	void AddDIP(int n, unsigned int nInstanceCount) { nDIPCall++; nDIP += n * nInstanceCount; nReducedDIPCall += nInstanceCount - 1; }
-	void AddDPUP(int n) { nDPUPCall++; nDPUP += n; }
-	void AddDIPUP(int n) { nDIPUPCall++; nDIPUP += n; }
-
-	int	GetTotalDrawPolygon() const { return nDP + nDIP + nDPUP + nDIPUP; }
-	int	GetTotalDrawCall() const { return nDPCall + nDIPCall + nDPUPCall + nDIPUPCall; }
-	int GetTotalReducedDrawCall() const { return nReducedDPCall + nReducedDIPCall; }
-
-	FDeviceProfileInfo()
+	enum class ETextureAddress
 	{
-		Reset();
-	}
+		TADDRESS_WRAP = 0,
+		TADDRESS_MIRROR,
+		TADDRESS_CLAMP,
+		TADDRESS_BORDER,
+		TADDRESS_MIRRORONCE,
+	};
 
-	void Reset()
+	enum class ETextureStageStateType
 	{
-		nDP = nDIP = nDPUP = nDIPUP = 0;
-		nDPCall = nDIPCall = nDPUPCall = nDIPUPCall = 0;
-		nReducedDPCall = nReducedDIPCall = 0;
-	}
-};
+		// stage state
+		TSS_COLOROP = 0,
+		TSS_COLORARG1,
+		TSS_COLORARG2,
+		TSS_ALPHAOP,
+		TSS_ALPHAARG1,
+		TSS_ALPHAARG2,
+		TSS_BUMPENVMAT00,
+		TSS_BUMPENVMAT01,
+		TSS_BUMPENVMAT10,
+		TSS_BUMPENVMAT11,
+		TSS_TEXCOORDINDEX,
+		TSS_BUMPENVLSCALE,
+		TSS_BUMPENVLOFFSET,
+		TSS_TEXTURETRANSFORMFLAGS,
+		TSS_COLORARG0,
+		TSS_ALPHAARG0,
+		TSS_RESULTARG,
+		TSS_CONSTANT,
 
-namespace Geass
-{
+		TSS_MAX
+	};
+
+	enum class EBlend
+	{
+		// Blending constants
+		BLEND_ZERO = 0,
+		BLEND_ONE,
+		BLEND_SRCCOLOR,
+		BLEND_INVSRCCOLOR,
+		BLEND_DESTCOLOR,
+		BLEND_INVDESTCOLOR,
+		BLEND_SRCALPHA,
+		BLEND_INVSRCALPHA,
+		BLEND_DESTALPHA,
+		BLEND_INVDESTALPHA,
+		BLEND_SRCALPHASAT,
+		BLEND_BLENDFACTOR,
+		BLEND_INVBLENDFACTOR,
+
+		BLEND_NONE,
+	};
+
+	enum class EBlendOP
+	{
+		// Blending operation
+		BLENDOP_ADD = 0,
+		BLENDOP_SUBTRACT,
+		BLENDOP_REVSUBTRACT,
+		BLENDOP_MIN,
+		BLENDOP_MAX,
+	};
+
+	enum class ECMPFunc
+	{
+		// depth compare function
+		CMP_NEVER = 0,
+		CMP_LESS,
+		CMP_EQUAL,
+		CMP_LESSEQUAL,
+		CMP_GREATER,
+		CMP_NOTEQUAL,
+		CMP_GREATEREQUAL,
+		CMP_ALWAYS,
+		CMP_END
+	};
+
+	enum class ECull
+	{
+		// Culling
+		CULL_NONE = 0,
+		CULL_CCW,
+		CULL_CW,
+	};
+
+	enum class EFillMode
+	{
+		// wireframe ( triangle line ) , solid
+		FILL_POINT = 0,
+		FILL_WIRE,
+		FILL_SOLID
+	};
+
+	enum class ESetTransformType
+	{
+		ST_WORLD = 0,
+		ST_VIEW,
+		ST_PROJECTION,
+		ST_TEXTURE0,
+		ST_TEXTURE1,
+		ST_TEXTURE2,
+		ST_TEXTURE3,
+
+		ST_MAX
+	};
+
+	enum class EStencilOP
+	{
+		// stencil operation
+		STENCILOP_KEEP = 0,
+		STENCILOP_ZERO,
+		STENCILOP_REPLACE,
+		STENCILOP_INCRSAT,
+		STENCILOP_DECRSAT,
+		STENCILOP_INVERT,
+		STENCILOP_INCR,
+		STENCILOP_DECR,
+	};
+
+	struct RLOCKED_RECT
+	{
+		INT Pitch;
+		void* pBits;
+	};
+
+	struct FDeviceProfileInfo
+	{
+		// Æú¸®°ï¼ö
+		int nDP;	// drawprimitive
+		int nDIP;	// drawindexprimitive
+		int nDPUP;	// drawprimitiveup
+		int nDIPUP;	// drawindexedprimitiveup
+
+		// call ¼ö
+		int nDPCall;	// drawprimitive
+		int nDIPCall;	// drawindexprimitive
+		int nDPUPCall;	// drawprimitiveup
+		int nDIPUPCall;	// drawindexedprimitiveup
+
+		unsigned int nReducedDPCall;
+		unsigned int nReducedDIPCall;
+
+		void AddDP(int n, unsigned int nInstanceCount) { nDPCall++; nDP += n * nInstanceCount; nReducedDPCall += nInstanceCount - 1; }
+		void AddDIP(int n, unsigned int nInstanceCount) { nDIPCall++; nDIP += n * nInstanceCount; nReducedDIPCall += nInstanceCount - 1; }
+		void AddDPUP(int n) { nDPUPCall++; nDPUP += n; }
+		void AddDIPUP(int n) { nDIPUPCall++; nDIPUP += n; }
+
+		int	GetTotalDrawPolygon() const { return nDP + nDIP + nDPUP + nDIPUP; }
+		int	GetTotalDrawCall() const { return nDPCall + nDIPCall + nDPUPCall + nDIPUPCall; }
+		int GetTotalReducedDrawCall() const { return nReducedDPCall + nReducedDIPCall; }
+
+		FDeviceProfileInfo()
+		{
+			Reset();
+		}
+
+		void Reset()
+		{
+			nDP = nDIP = nDPUP = nDIPUP = 0;
+			nDPCall = nDIPCall = nDPUPCall = nDIPUPCall = 0;
+			nReducedDPCall = nReducedDIPCall = 0;
+		}
+	};
+
 	class GTexture;
 	class GTextureManager;
+	class GShaderFX;
+	class GVertexAttribute;
+	class GVertexAttributeEx;
+	class GTextureInfo;
+	class LoadingController;
 
 	class GEASS_API GDevice
 	{
@@ -205,176 +257,175 @@ namespace Geass
 		bool					bCurrentColorWriteEnable;
 		ECull					CurrentCullMode;
 		EFillMode				CurrentFillMode;
+		FMatrix					CurrentTransform[(unsigned int)ESetTransformType::ST_MAX];
 
-		// RMatrix			currentTransform[RST_MAX];
+		bool					bCurrentLighting;
+		bool					bCurrentNormalizeNormals;
+		DWORD					bCurrentAmbientColor;
+		bool					bCurrentAlphaTestEnable;
+		DWORD					CurrentAlphaRef;
+		ECMPFunc				CurrentAlphaFunc;
+		bool					bCurrentClipping;
+		bool					bCurrentScissorTestEnable;
+		bool					bCurrentFog;
+		DWORD					CurrentFogColor;
+		float					CurrentFogNear, CurrentFogFar;
+		bool					bCurrentVertexBlendEnable;
+		bool					bCurrentIndexedVertexBlendEnable;
+		bool					bCurrentSpecularEnable;
 
-		/*
+		bool					bCurrentColorVertexEnable;
+		DWORD					CurrentClipPlaneEnable;
 
+		float					CurrentDepthBias;
+		float					CurrentSlopeScaleDepthBias;
 
+		EStencilOP				CurrentStencilPass;
+		EStencilOP				CurrentStencilFail;
+		EStencilOP				CurrentStencilZFail;
 
+		bool					bCursor;
 
-		bool			currentLighting;
-		bool			currentNormalizeNormals;
-		DWORD			currentAmbientColor;
-		//bool			currentAlphaBlendEnable;
-		bool			currentAlphaTestEnable;
-		DWORD			currentAlphaRef;
-		RCMPFUNC		currentAlphaFunc;
-		bool			currentClipping;
-		bool			currentScissorTestEnable;
-		bool			currentFog;
-		DWORD			currentFogColor;
-		float			currentFogNear, currentFogFar;
-		bool			currentVertexBlendEnable;
-		bool			currentIndexedVertexBlendEnable;
-		bool			currentSpecularEnable;
+		int						ScreenWidth;
+		int						ScreenHeight;
+		EBufferFormat			DepthFormat;
 
-		bool			currentColorVertexEnable;
-		DWORD			currentClipPlaneEnable;
+		std::vector<GShaderFX*>	ShaderFXs;
 
-		float			currentDepthBias;
-		float			currentSlopeScaleDepthBias;
+		GTexture*				DefaultTexture;
+		GTexture*				DefaultNoiseTexture;
 
-		RSTENCILOP		currentStencilPass;
-		RSTENCILOP		currentStencilFail;
-		RSTENCILOP		currentStencilZFail;
+		unsigned int			FrameCount;
+		unsigned int			LastFPSFrameCount;
 
-		// ��Ÿ
-		bool			m_bCursor;
-		//	RConfiguration	m_currentConfig;
-		int				m_nScreenWidth;
-		int				m_nScreenHeight;
-		RFORMAT			m_depthFormat;
+		float					FPS;
+		DWORD					LastFPSTime;
 
-		vector<RShaderFX*>	m_vShaderFXs;
+		DWORD					LastFlipTime;
+		DWORD					LastElapsedTime;
 
-		RTexture* m_pDefaultTexture;
-		RTexture* m_pDefaultNoiseTexture;
-
-		// flip����
-		unsigned int	m_nFrameCount;
-		unsigned int	m_nLastFPSFrameCount;
-
-		float			m_fFPS;
-		DWORD			m_dwLastFPSTime;
-
-		DWORD			m_dwLastFlipTime;
-		DWORD			m_dwLastElapsedTime;
-
-		RViewport		m_viewport;
-
-		RVector4		m_vDofParams;
+		GViewport				Viewport;
+		FVector4				DofParams;
 
 	protected:
-		virtual void OnFlip() = 0;
-		virtual void OnSetViewport(const RViewport&) = 0;
-		virtual void OnResetDevice() {}
-		virtual void OnShowCursor(bool bShow) {}
 
-		// sampler ��ȣ -> ���� ����� index �� ��ȯ
+		virtual void OnFlip() = 0;
+		virtual void OnSetViewport(const GViewport&) = 0;
+		virtual void OnResetDevice() { ; }
+		virtual void OnShowCursor(bool bShow) { ; }
+
 		unsigned int GetSamplerNumberToSaveIndex(unsigned int nStage);
-		//  ���� ����� index -> sampler ��ȣ �� ��ȯ
 		unsigned int GetSaveIndexToSamplerNumber(unsigned int nIndex);
 
-		void IncreaseFrameCount() { m_nFrameCount++; }
-
+		inline void IncreaseFrameCount() { FrameCount++; }
 		virtual void SetVertexBufferFreq(UINT stream, UINT FrequencyParameter) = 0;
 
 	public:
-		RDevice();
-		virtual ~RDevice() {}
 
 		virtual bool Create(HWND hWnd) = 0;
 		virtual void Destroy() = 0;
 
-		int				GetScreenWidth() { return m_nScreenWidth; }
-		int				GetScreenHeight() { return m_nScreenHeight; }
-		RFORMAT			GetDepthFormat() { return m_depthFormat; }
-		DWORD			GetLastElapsedTime() { return m_dwLastElapsedTime; }
-		unsigned int	GetFrameCount() { return m_nFrameCount; }
-		float			GetFrameRate() { return m_fFPS; }
-		unsigned int	GetTextureMemoryUsed();
-		virtual unsigned int	GetVertexBufferMemoryUsed() = 0;
+		inline int GetScreenWidth() { return ScreenWidth; }
+		inline int GetScreenHeight() { return ScreenHeight; }
+		inline EBufferFormat GetDepthFormat() { return DepthFormat; }
+		inline DWORD GetLastElapsedTime() { return LastElapsedTime; }
+		inline unsigned int GetFrameCount() { return FrameCount; }
+		inline float GetFrameRate() { return FPS; }
 
-		const RTextureManager* GetTextureManager() { return m_pTextureManager; }
+		unsigned int GetTextureMemoryUsed();
+		virtual unsigned int GetVertexBufferMemoryUsed() = 0;
 
-		const RDeviceProfileInfo& GetDeviceProfileInfo() { return m_deviceProfileInfoLast; }
+		inline const GTextureManager* GetTextureManager() { return TextureManager; }
+		inline const FDeviceProfileInfo& GetDeviceProfileInfo() { return DeviceProfileInfoLast; }
 
-		bool	IsCursorVisible();
-		bool	ShowCursor(bool bShow);
+		bool IsCursorVisible();
+		bool ShowCursor(bool bShow);
 
 		virtual void InitDeviceDefault();
-		virtual bool ResetDevice() = 0;	// rs3::config�κ��� ������ �ٽ� �о ����̽��� reset�Ѵ�
+		virtual bool ResetDevice() = 0;
 
 		virtual void Flip();
-		void SetViewport(const RViewport& viewport);
+		void SetViewport(const GViewport& viewport);
 		void SetViewport(int x, int y, int nWidth, int nHeight, float fMinZ = 0, float fMaxZ = 1);
-		RViewport GetViewport() const { return m_viewport; }
+		inline GViewport GetViewport() const { return Viewport; }
 
-		virtual bool QueryFeature(RQUERYFEATURETYPE feature) = 0;
-		virtual RDEVICESTATUS QueryStatus() = 0;
+		virtual bool QueryFeature(EQueryFeatureType feature) = 0;
+		virtual EDeviceStatus QueryStatus() = 0;
 
 		virtual bool BeginScene() = 0;
 		virtual void EndScene() = 0;
 
-		virtual void Clear(bool bTarget = true, bool bDepth = true, bool bStencil = false, DWORD dwColor = 0, float fDepth = 1.f, DWORD dwStencil = 0, DWORD nIdx = 0) = 0;	// �������� ���� �߰� - 090625, OZ
+		virtual void Clear(bool bTarget = true, bool bDepth = true, bool bStencil = false, DWORD dwColor = 0, float fDepth = 1.f, DWORD dwStencil = 0, DWORD nIdx = 0) = 0;
 
 		//////////////////////////////////////////////////////////////////////////
 		// Render Target / Depth Buffer
-		// ���ϰ��� ���� ���̹���/����Ÿ��
-		virtual RTexture* SetRenderTarget(unsigned int nRenderTargetIndex, RTexture* pTexture, int nSurface = 0) = 0;
-		virtual RTexture* GetRenderTarget(unsigned int nRenderTargetIndex) = 0;
-		virtual RTexture* SetDepthStencilBuffer(RTexture* pTexture) = 0;
-		virtual RTexture* GetDepthStencilBuffer() = 0;
+		virtual GTexture* SetRenderTarget(unsigned int nRenderTargetIndex, GTexture* pTexture, int nSurface = 0) = 0;
+		virtual GTexture* GetRenderTarget(unsigned int nRenderTargetIndex) = 0;
+		virtual GTexture* SetDepthStencilBuffer(GTexture* pTexture) = 0;
+		virtual GTexture* GetDepthStencilBuffer() = 0;
 
 		//////////////////////////////////////////////////////////////////////////
 		// Vertex Format
-		virtual HVERTEXFORMAT CreateVertexFormat(const RVertexAttribute* attribs, const int nAttribs, const int nStream = 0, const int nStartTexCoord = 0) = 0;
-		virtual HVERTEXFORMAT	CreateVertexFormat(const RVertexAttributeEx* attribs, const int nAttribs) = 0;
+		virtual int CreateVertexFormat(const GVertexAttribute* attribs, const int nAttribs, const int nStream = 0, const int nStartTexCoord = 0) = 0;
+		virtual int CreateVertexFormat(const GVertexAttributeEx* attribs, const int nAttribs) = 0;
 		virtual void SetFvF(DWORD fvf) = 0;
 
 		//////////////////////////////////////////////////////////////////////////
 		// texture 
-		virtual RTexture* NewTexture() = 0;
-		virtual void		ReleaseTexture(RTexture* pTexture) {} //TODO_ignore444 : ������ �����ǵ� �������� �ȵǾ ����
+		virtual GTexture* NewTexture() = 0;
+		virtual void ReleaseTexture(GTexture* pTexture) { ; }
 
-		const RTextureInfo* GetTextureInfo(RTexture* pTexture);
+		const GTextureInfo* GetTextureInfo(GTexture* pTexture);
 
-		RTexture* CreateTextureForBuildLater(const char* fileName, const RTEXTUREFILTERTYPE filter = RTF_LINEAR,
-			DWORD flags = RCT_AUTOGENMIPMAP, RFORMAT pf = RFMT_NONE, bool bBackground = false, RResource::LoadingController* pController = NULL);
-		RTexture* CreateTexture(const char* fileName, const RTEXTUREFILTERTYPE filter = RTF_LINEAR,
-			DWORD flags = RCT_AUTOGENMIPMAP, RFORMAT pf = RFMT_NONE, bool bBackground = false, RResource::LoadingController* pController = NULL);
-		RTexture* CreateTexture(int nWidth, int nHeight, RFORMAT pf, const RTEXTUREFILTERTYPE filter = RTF_LINEAR, DWORD flags = 0, void* pixels = NULL, const char* szName = NULL);
-		//	RTexture* CreateTextureByName(const char *pSzTextureName, RTexture* pDefaultPixelSrcTexture, const RTEXTUREFILTERTYPE filter = RTF_LINEAR, DWORD flags = 0, RFORMAT pf = RFMT_NONE);
-		RTexture* CreateGarbageRenderTargetTexture(int nWidth, int nHeight, RFORMAT pf);
+		GTexture* CreateTextureForBuildLater(
+			const char* fileName,
+			const ETextureFilterType filter = ETextureFilterType::TF_LINEAR,
+			DWORD flags = RCT_AUTOGENMIPMAP,
+			EBufferFormat pf = EBufferFormat::FMT_NONE,
+			bool bBackground = false,
+			LoadingController* pController = nullptr);
 
-		// GetTextureByName �� CreateTextureByName �� �и��ϴ°� ������ �մϴ�
-	//	RTexture* GetTextureByName( const char* pSzTextureName, bool bCreateIfNotExist = true, RTexture* pSrcDefaultPixelTexture = NULL);
+		GTexture* CreateTexture(
+			const char* fileName,
+			const ETextureFilterType filter = ETextureFilterType::TF_LINEAR,
+			DWORD flags = RCT_AUTOGENMIPMAP,
+			EBufferFormat pf = EBufferFormat::FMT_NONE,
+			bool bBackground = false,
+			LoadingController* pController = nullptr);
+
+		GTexture* CreateTexture(
+			int nWidth,
+			int nHeight,
+			EBufferFormat pf,
+			const ETextureFilterType filter = ETextureFilterType::TF_LINEAR,
+			DWORD flags = 0,
+			void* pixels = nullptr,
+			const char* szName = nullptr);
+
+		GTexture* CreateGarbageRenderTargetTexture(int nWidth, int nHeight, EBufferFormat pf);
 
 		// create special texture - render target and normal map
-		virtual RTexture* CreateRenderTargetTexture(int nWidth, int nHeight, RFORMAT pf, const RTEXTUREFILTERTYPE filter = RTF_LINEAR, DWORD flags = 0);
-		virtual RTexture* CreateRenderTargetDepthStencilTexture(int nWidth, int nHeight, RFORMAT pf, const RTEXTUREFILTERTYPE filter = RTF_LINEAR, DWORD flags = 0);	// D3DUSAGE_DEPTHSTENCIL�� ����ϴ� - 090622, OZ
-		virtual RTexture* CreateNormalMapFromHeightMap(RTexture* hHeightMap, float fAttitude) = 0;
-		//	TODO: file in memory ���� �ؽ��� �����ϴ� ��� �ʿ�
-		//	virtual HTEXTURE CreateCubeMapTexture();
-		//	virtual HTEXTURE CreateDepthStencil();
+		virtual GTexture* CreateRenderTargetTexture(int nWidth, int nHeight, EBufferFormat pf, const ETextureFilterType filter = ETextureFilterType::TF_LINEAR, DWORD flags = 0);
+		virtual GTexture* CreateRenderTargetDepthStencilTexture(int nWidth, int nHeight, EBufferFormat pf, const ETextureFilterType filter = ETextureFilterType::TF_LINEAR, DWORD flags = 0);
+		virtual GTexture* CreateNormalMapFromHeightMap(GTexture* hHeightMap, float fAttitude) = 0;
 
-		void DeleteTexture(RTexture* pTexture);
-		void SafeDeleteTexture(RTexture*& pTexture); ///< SAFE_DELETE ��ũ�ο� ����� ������ �ϵ��� ������� �Լ�
-		RTexture* GetTexture(const char* pSzTextureName);
+		void DeleteTexture(GTexture* pTexture);
+		void SafeDeleteTexture(GTexture*& pTexture);
+		GTexture* GetTexture(const char* pSzTextureName);
+
+		virtual bool GenerateMipmapLevels(GTexture* pTexture) = 0;
+		virtual bool LockRect(GTexture* pTex, int nLevel, RLOCKED_RECT* pLockedRect, const RECT* pRect, DWORD Flags) = 0;
+		virtual bool UnlockRect(GTexture* pTex, int nLevel) = 0;
+		virtual bool UpdateTexture(GTexture* pTexture, int nLevel, int nDestX, int nDestY, int nSrcWidth, int nSrcHeight, void* pSrcPixels) = 0;
+		virtual bool ColorFill(GTexture* pTexture, DWORD dwColor = 0) = 0;
+
+		virtual bool UpdateTexture(GTexture* pTexture, int nLevel, int nDestX, int nDestY, int nDestWidth, int nDestHeight, int nSrcX, int nSrcY, int nSrcWidth, int nSrcHeight, void* pSrcPixels) = 0;
+		
+		/*
 
 
-		virtual bool GenerateMipmapLevels(RTexture* pTexture) = 0;
-		virtual bool LockRect(RTexture* pTex, int nLevel, RLOCKED_RECT* pLockedRect, const RECT* pRect, DWORD Flags) = 0;
-		virtual bool UnlockRect(RTexture* pTex, int nLevel) = 0;
-		virtual bool UpdateTexture(RTexture* pTexture, int nLevel, int nDestX, int nDestY, int nSrcWidth, int nSrcHeight, void* pSrcPixels) = 0;
-		virtual bool ColorFill(RTexture* pTexture, DWORD dwColor = 0) = 0;
-
-		/// nSrcWidth, nSrcHeight ũ���� SrcPixel��, nSrcX, nSrcY �� �������� nDestWidth, nDestHeight ũ�⸸ŭ nDestX, nDestY�� �����Ѵ�.
-		virtual bool UpdateTexture(RTexture* pTexture, int nLevel, int nDestX, int nDestY, int nDestWidth, int nDestHeight, int nSrcX, int nSrcY, int nSrcWidth, int nSrcHeight, void* pSrcPixels) = 0;
-
-		RTexture* GetDefaultTexture();
-		RTexture* GetDefaultNoiseTexture();
+		GTexture* GetDefaultTexture();
+		GTexture* GetDefaultNoiseTexture();
 
 		//////////////////////////////////////////////////////////////////////////
 		// Vertex Buffer
@@ -385,7 +436,7 @@ namespace Geass
 
 		//////////////////////////////////////////////////////////////////////////
 		// Index Buffer
-		virtual HINDEXBUFFER CreateIndexBuffer(const unsigned int nIndices, RFORMAT inf = RFMT_INDEX16, const void* data = NULL, unsigned int flags = 0) = 0;
+		virtual HINDEXBUFFER CreateIndexBuffer(const unsigned int nIndices, EBufferFormat inf = RFMT_INDEX16, const void* data = NULL, unsigned int flags = 0) = 0;
 		virtual void DeleteIndexBuffer(HINDEXBUFFER hIndexBuffer) = 0;
 		virtual void* LockIndexBuffer(const HINDEXBUFFER hIndexBuffer, const unsigned int flags = 0, const unsigned int nOffsetToLock = 0, const unsigned int nSizeToLock = 0) = 0;
 		virtual bool UnlockIndexBuffer(const HINDEXBUFFER hIndexBuffer) = 0;
@@ -393,7 +444,7 @@ namespace Geass
 		//////////////////////////////////////////////////////////////////////////
 		// DrawPrimitives
 		virtual bool DrawIndexedPrimitiveUP(RPRIMITIVETYPE primitiveType, unsigned int nMinVertexIndex, unsigned int nNumVertices, unsigned int nPrimitiveCount,
-			const void* pIndexData, const void* pVertexStreamZeroData, unsigned int VertexStreamZeroStride, RFORMAT indexFmt = RFMT_INDEX16) = 0;
+			const void* pIndexData, const void* pVertexStreamZeroData, unsigned int VertexStreamZeroStride, EBufferFormat indexFmt = RFMT_INDEX16) = 0;
 		virtual bool DrawIndexedPrimitive(RPRIMITIVETYPE primitiveType, unsigned int nBaseVertexIndex, unsigned int nMinIndex, unsigned int nNumVertices,
 			unsigned int nStartIndex, unsigned int nPrimitiveCount) = 0;
 		virtual bool DrawPrimitiveUP(RPRIMITIVETYPE primitiveType, unsigned int nPrimitiveCount, const void* pVertexStreamZeroData, unsigned int VertexStreamZeroStride) = 0;
@@ -432,10 +483,10 @@ namespace Geass
 
 		virtual void SetIndexBuffer(HINDEXBUFFER hIndexBuffer) = 0;
 
-		virtual void SetTexture(int nStage, RTexture* pTexture) = 0;
-		RTexture* GetTexture(int nStage);
+		virtual void SetTexture(int nStage, GTexture* pTexture) = 0;
+		GTexture* GetTexture(int nStage);
 		virtual void SetTextureStageState(int nStage, RTEXTURESTAGESTATETYPE nStageStateType, unsigned int value) = 0;
-		virtual void SetTextureFilter(int nSampler, RTEXTUREFILTERTYPE type) = 0;
+		virtual void SetTextureFilter(int nSampler, ETextureFilterType type) = 0;
 		virtual void SetTextureMipmapLodBias(int nStage, float fBias) = 0;
 		virtual void SetTextureMaxAnisotropy(int nStage, DWORD dwValue) = 0;
 		virtual DWORD GetTextureMaxAnisotropy(int nStage);
@@ -523,7 +574,7 @@ namespace Geass
 
 		virtual void SetColorVertex(bool bEnable) = 0;
 
-		virtual RImage* CreateImage(int nWidth, int nHeight, RFORMAT format, void* pSrcPixels, int nSourcePitch, int nSrcX, int nSrcY);
+		virtual RImage* CreateImage(int nWidth, int nHeight, EBufferFormat format, void* pSrcPixels, int nSourcePitch, int nSrcX, int nSrcY);
 		virtual void DeleteImage(RImage*);
 
 		virtual bool SetCursorProperties(int XHotSpot, int YHotSpot, RImage* pImage);

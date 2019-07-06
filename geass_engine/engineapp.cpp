@@ -16,6 +16,7 @@ Geass::GEngineApplication::~GEngineApplication()
 
 bool Geass::GEngineApplication::Create()
 {
+	/*
 	Device = new GDevice();
 	SceneManager = new GSceneManager();
 	if (!SceneManager || !Device)
@@ -26,6 +27,8 @@ bool Geass::GEngineApplication::Create()
 	bool bSuccess = SceneManager->Create(Device);
 	Activate(bSuccess);
 	return bSuccess;
+	*/
+	return false;
 }
 
 void Geass::GEngineApplication::Destroy()

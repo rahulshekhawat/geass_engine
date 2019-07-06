@@ -166,6 +166,7 @@
     <ClInclude Include="gdevice.h" />
     <ClInclude Include="glib.h" />
     <ClInclude Include="gscenemanager.h" />
+    <ClInclude Include="gtexture.h" />
     <ClInclude Include="gtypes.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
