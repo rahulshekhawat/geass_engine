@@ -4,6 +4,7 @@
 
 #include "glib.h"
 #include "gtypes.h"
+#include <matrix.h>
 
 #define MAX_PIXELSAMPLER	16
 #define MAX_VERTEXSAMPLER	4

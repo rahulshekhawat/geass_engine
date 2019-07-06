@@ -11,7 +11,7 @@ class FVector3;
  * Since error rate is high, use it only for normal vectors
  */
 
-class GEASS_API MSVector
+class GEASSCOMMON_API MSVector
 {
 	friend class MSVector2;
 
@@ -57,7 +57,7 @@ private:
 };
 
 
-class GEASS_API MSVector2
+class GEASSCOMMON_API MSVector2
 {
 
 public:

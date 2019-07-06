@@ -4,7 +4,7 @@
 #include "glib.h"
 #include "vector3.h"
 
-class GEASS_API FVector4
+class GEASSCOMMON_API FVector4
 {
 public:
 

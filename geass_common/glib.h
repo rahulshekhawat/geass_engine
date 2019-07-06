@@ -1,14 +1,14 @@
 #pragma once
 
-#ifndef GEASS_API
+#ifndef GEASSCOMMON_API
 
 #ifdef GEASSCOMMON_EXPORTS
-#define GEASS_API __declspec(dllexport)
+#define GEASSCOMMON_API __declspec(dllexport)
 #else
-#define GEASS_API __declspec(dllimport)
+#define GEASSCOMMON_API __declspec(dllimport)
 #endif
 
-#endif // !GEASS_API
+#endif // !GEASSCOMMON_API
 
 
 #ifndef SAFE_DELETE

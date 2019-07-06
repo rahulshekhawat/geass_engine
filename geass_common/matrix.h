@@ -5,8 +5,10 @@
 #include "vector3.h"
 #include "vector4.h"
 
+#include <assert.h>
 
-class GEASS_API FMatrix
+
+class GEASSCOMMON_API FMatrix
 {
 public:
 
@@ -888,7 +890,7 @@ inline void FMatrix::ExtractScale(FVector3& vecScale) const
 //////////////////////////////////////////////////////////////////////////
 // Aligned 16 Matrix (for SSE)
 __declspec(align(16))
-class GEASS_API FMatrixA16 : public FMatrix
+class GEASSCOMMON_API FMatrixA16 : public FMatrix
 {
 public:
 	inline FMatrixA16& operator=(const FMatrixA16& other);

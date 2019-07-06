@@ -6,7 +6,7 @@
 class MSVector;
 class MSVector2;
 
-class GEASS_API FVector3
+class GEASSCOMMON_API FVector3
 {
 public:
 
