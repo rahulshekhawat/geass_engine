@@ -4,12 +4,10 @@
 
 MSVector& MSVector::operator=(const FVector3& other)
 {
-	//~ @todo
-	/*
 	m_x = _32To16(other.x);
 	m_y = _32To16(other.y);
 	m_z = _32To16(other.z);
-	*/
+
 	return *this;
 }
 
@@ -96,10 +94,8 @@ unsigned int MSVector::halfToFloatI(unsigned short var)
 
 MSVector2& MSVector2::operator=(const FVector3& other)
 {
-	//~ @todo
-	/*
 	m_x = _32To16(other.x);
 	m_y = _32To16(other.y);
-	*/
+
 	return *this;
 }
