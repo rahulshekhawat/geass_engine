@@ -30,6 +30,8 @@ namespace Geass
 #define RCT_SYSTEMMEM		0x400
 #define RCT_DEPTHSTENCIL	0x800
 
+#define FPS_INTERVAL		1000
+
 	const int MAX_RENDERTARGET = 4;
 
 	enum class ETextureAddress

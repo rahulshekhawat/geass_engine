@@ -163,20 +163,30 @@
   <ItemGroup>
     <ClInclude Include="engineapp.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="gbackgroundworker.h" />
+    <ClInclude Include="gconfiguration.h" />
     <ClInclude Include="gdevice.h" />
+    <ClInclude Include="gengine.h" />
     <ClInclude Include="ge_lib.h" />
+    <ClInclude Include="glistener.h" />
+    <ClInclude Include="gprofileinfo.h" />
     <ClInclude Include="gscenemanager.h" />
+    <ClInclude Include="gsysteminfo.h" />
     <ClInclude Include="gtexture.h" />
     <ClInclude Include="gtexturemanager.h" />
+    <ClInclude Include="gtimer.h" />
     <ClInclude Include="gtypes.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="engineapp.cpp" />
+    <ClCompile Include="gbackgroundworker.cpp" />
     <ClCompile Include="gdevice.cpp" />
+    <ClCompile Include="gengine.cpp" />
     <ClCompile Include="gscenemanager.cpp" />
     <ClCompile Include="gtexturemanager.cpp" />
+    <ClCompile Include="gtimer.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

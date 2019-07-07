@@ -38,6 +38,27 @@
     <ClInclude Include="gtexturemanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gengine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gtimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gbackgroundworker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glistener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gconfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gprofileinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gsysteminfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -56,6 +77,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gtexturemanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gengine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gbackgroundworker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gtimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

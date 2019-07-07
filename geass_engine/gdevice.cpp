@@ -18,7 +18,10 @@ namespace Geass
 	const int RTA_ALPHAREPLICATE = D3DTA_ALPHAREPLICATE;
 	const int RTA_NOT_INITIALIZED = 0xffffff;
 
-	GDevice::GDevice()
+	GDevice::GDevice() :
+		FrameCount(0),
+		DefaultTexture(nullptr),
+		DefaultNoiseTexture(nullptr)
 	{
 	}
 
@@ -156,6 +159,28 @@ namespace Geass
 
 	void GDevice::Flip()
 	{
+		OnFlip();
+
+		IncreaseFrameCount();
+
+		DWORD CurrentTime = timeGetTime();
+		LastElapsedTime = CurrentTime - LastFlipTime;
+		if (LastFPSTime + FPS_INTERVAL < CurrentTime)
+		{
+			FPS = (FrameCount - LastFPSFrameCount) * FPS_INTERVAL / ((float)(CurrentTime - LastFPSTime) * (FPS_INTERVAL / 1000));
+			LastFPSTime = CurrentTime;
+			LastFPSFrameCount = FrameCount;
+		}
+
+		LastFlipTime = CurrentTime;
+
+		//~ @todo
+		// REngine::GetResourceProfiler().Reset();
+		// REngine::GetResourceProfiler().UpdateTimeQueue("FrameTime", LastElapsedTime);
+		// REngine::GetResourceProfiler().UpdateTimeProfileNodes();
+
+		DeviceProfileInfoLast = DeviceProfileInfoCurrent;
+		DeviceProfileInfoCurrent.Reset();
 	}
 
 	void GDevice::SetViewport(const GViewport& viewport)
