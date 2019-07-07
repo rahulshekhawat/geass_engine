@@ -4,6 +4,11 @@
 
 namespace Geass
 {
+	class GTexture;
+
+	const int R_NONE = 0;
+	extern GTexture* RT_FRAMEBUFFER;
+
 	class GEASSENGINE_API GViewport
 	{
 	public:

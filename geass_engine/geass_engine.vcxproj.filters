@@ -35,6 +35,9 @@
     <ClInclude Include="ge_lib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gtexturemanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -50,6 +53,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gscenemanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gtexturemanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

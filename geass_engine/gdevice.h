@@ -6,6 +6,7 @@
 #include "gtypes.h"
 #include <matrix.h>
 #include <vector>
+#include <d3d9types.h>
 
 namespace Geass
 {
@@ -63,6 +64,37 @@ namespace Geass
 		TSS_CONSTANT,
 
 		TSS_MAX
+	};
+
+	enum class ETextureOP
+	{	
+		// texture operation
+		TOP_DISABLE = 0,
+		TOP_SELECTARG1,
+		TOP_SELECTARG2,
+		TOP_MODULATE,
+		TOP_MODULATE2X,
+		TOP_MODULATE4X,
+		TOP_ADD,
+		TOP_ADDSIGNED,
+		TOP_ADDSIGNED2X,
+		TOP_SUBTRACT,
+		TOP_ADDSMOOTH,
+		TOP_BLENDDIFFUSEALPHA,
+		TOP_BLENDTEXTUREALPHA,
+		TOP_BLENDFACTORALPHA,
+		TOP_BLENDTEXTUREALPHAPM,
+		TOP_BLENDCURRENTALPHA,
+		TOP_PREMODULATE,
+		TOP_MODULATEALPHA_ADDCOLOR,
+		TOP_MODULATECOLOR_ADDALPHA,
+		TOP_MODULATEINVALPHA_ADDCOLOR,
+		TOP_MODULATEINVCOLOR_ADDALPHA,
+		TOP_BUMPENVMAP,
+		TOP_BUMPENVMAPLUMINANCE,
+		TOP_DOTPRODUCT3,
+		TOP_MULTIPLYADD,
+		TOP_LERP,
 	};
 
 	enum class EBlend
@@ -162,6 +194,19 @@ namespace Geass
 		PT_TRIANGLEFAN,
 	};
 
+	// stage state arg type
+	extern GEASSENGINE_API const int RTA_DIFFUSE;
+	extern GEASSENGINE_API const int RTA_CURRENT;
+	extern GEASSENGINE_API const int RTA_TEXTURE;
+	extern GEASSENGINE_API const int RTA_TFACTOR;
+	extern GEASSENGINE_API const int RTA_SPECULAR;
+	extern GEASSENGINE_API const int RTA_TEMP;
+	extern GEASSENGINE_API const int RTA_CONSTANT;
+	extern GEASSENGINE_API const int RTA_COMPLEMENT;
+	extern GEASSENGINE_API const int RTA_ALPHAREPLICATE;
+	extern GEASSENGINE_API const int RTA_NOT_INITIALIZED;
+
+
 	struct RLOCKED_RECT
 	{
 		INT Pitch;
@@ -241,7 +286,7 @@ namespace Geass
 		GTexture*				CurrentTextures[MAX_IMAGEUNIT];
 		ETextureFilterType		CurrentTextureFilter[MAX_IMAGEUNIT];
 		ETextureAddress			CurrentTextureAddress[MAX_IMAGEUNIT][3];	// u,v,w
-		unsigned int			CurrentTextureStageSettings[MAX_IMAGEUNIT][(unsigned int)ETextureStageStateType::TSS_MAX];
+		unsigned int			CurrentTextureStageSettings[MAX_IMAGEUNIT][(UINT)ETextureStageStateType::TSS_MAX];
 		DWORD					CurrentMaxAnisotropy[MAX_IMAGEUNIT];
 		float					CurrentMipmaplodBias[MAX_IMAGEUNIT];
 		DWORD					CurrentTextureBorderColor[MAX_IMAGEUNIT];
@@ -274,11 +319,11 @@ namespace Geass
 		bool					bCurrentColorWriteEnable;
 		ECull					CurrentCullMode;
 		EFillMode				CurrentFillMode;
-		FMatrix					CurrentTransform[(unsigned int)ESetTransformType::ST_MAX];
+		FMatrix					CurrentTransform[(UINT)ESetTransformType::ST_MAX];
 
 		bool					bCurrentLighting;
 		bool					bCurrentNormalizeNormals;
-		DWORD					bCurrentAmbientColor;
+		DWORD					CurrentAmbientColor;
 		bool					bCurrentAlphaTestEnable;
 		DWORD					CurrentAlphaRef;
 		ECMPFunc				CurrentAlphaFunc;

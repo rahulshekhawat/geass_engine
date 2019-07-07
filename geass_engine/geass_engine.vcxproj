@@ -97,7 +97,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>geass_common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>geass_common.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\ryu_game\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -136,7 +136,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>geass_common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>geass_common.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\ryu_game\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -167,6 +167,7 @@
     <ClInclude Include="ge_lib.h" />
     <ClInclude Include="gscenemanager.h" />
     <ClInclude Include="gtexture.h" />
+    <ClInclude Include="gtexturemanager.h" />
     <ClInclude Include="gtypes.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -175,6 +176,7 @@
     <ClCompile Include="engineapp.cpp" />
     <ClCompile Include="gdevice.cpp" />
     <ClCompile Include="gscenemanager.cpp" />
+    <ClCompile Include="gtexturemanager.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
