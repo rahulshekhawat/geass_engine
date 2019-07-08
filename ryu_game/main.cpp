@@ -1,6 +1,12 @@
 #include <iostream>
+#include <gengine.h>
 
 int main()
 {
-	std::cout << "Hello World!\n";
+	Geass::GEngine Engine;
+	Engine.strDebugFlags;
+	// Engine.strDebugFlags;
+
+
+
 }

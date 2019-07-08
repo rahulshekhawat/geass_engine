@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning (disable : 4251)
 
 // #define _SHADER30
 
@@ -43,12 +44,15 @@ namespace Geass
 	class GDevice;
 	class GSceneManager;
 
+	template class GESTL std::vector<unsigned int>;
+	template class GESTL std::vector<std::string>;
+
 	class GEASSENGINE_API GEngine
 	{
-		GEngine() {}
-		virtual ~GEngine() {}
-
 	public:
+
+		GEngine() { ; }
+		virtual ~GEngine() { ; }
 
 		inline static GBackgroundWorker& GetBackgroundWorker() { return BackgroundWorker; }
 		inline static GTimer& GetTimer() { return Timer; }

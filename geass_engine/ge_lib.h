@@ -4,8 +4,10 @@
 
 #ifdef GEASSENGINE_EXPORTS
 #define GEASSENGINE_API __declspec(dllexport)
+#define GESTL __declspec(dllexport)
 #else
 #define GEASSENGINE_API __declspec(dllimport)
+#define GESTL
 #endif
 
 #endif // !GEASSENGINE_API
